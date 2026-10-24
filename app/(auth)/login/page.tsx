@@ -1,47 +1,51 @@
-'use client';
+"use client"
 
-import { useState, useTransition } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { signIn } from 'next-auth/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Suspense, useState, useTransition } from "react"
+import { useSearchParams } from "next/navigation"
+import Link from "next/link"
+import { signIn } from "next-auth/react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
-  Card, CardContent, CardDescription,
-  CardFooter, CardHeader, CardTitle
-} from '@/components/ui/card';
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
-export default function LoginPage() {
-  const params = useSearchParams();
-  const [error, setError] = useState('');
-  const [isPending, startTransition] = useTransition();
+function LoginForm() {
+  const params = useSearchParams()
+  const [error, setError] = useState("")
+  const [isPending, startTransition] = useTransition()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError('');
+    event.preventDefault()
+    setError("")
 
-    const formData = new FormData(event.currentTarget);
-    const email = String(formData.get('email') ?? '');
-    const password = String(formData.get('password') ?? '');
+    const formData = new FormData(event.currentTarget)
+    const email = String(formData.get("email") ?? "")
+    const password = String(formData.get("password") ?? "")
 
     startTransition(async () => {
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
-        callbackUrl: '/dashboard',
-      });
+        callbackUrl: "/dashboard",
+      })
 
       if (result?.error) {
-        setError('Invalid credentials');
-        return;
+        setError("Invalid credentials")
+        return
       }
 
-      window.location.href = result?.url ?? '/dashboard';
-    });
-  };
+      window.location.href = result?.url ?? "/dashboard"
+    })
+  }
 
   return (
     <Card className="w-full max-w-sm">
@@ -52,14 +56,18 @@ export default function LoginPage() {
 
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
-          {params.get('verified') && (
+          {params.get("verified") && (
             <Alert>
-              <AlertDescription>Email verified! Please sign in.</AlertDescription>
+              <AlertDescription>
+                Email verified! Please sign in.
+              </AlertDescription>
             </Alert>
           )}
-          {params.get('reset') && (
+          {params.get("reset") && (
             <Alert>
-              <AlertDescription>Password reset! Please sign in.</AlertDescription>
+              <AlertDescription>
+                Password reset! Please sign in.
+              </AlertDescription>
             </Alert>
           )}
           {error && (
@@ -70,31 +78,36 @@ export default function LoginPage() {
 
           <div className="space-y-1">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email"
-              type="email" placeholder="you@example.com"
-              autoComplete="email" required />
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              autoComplete="email"
+              required
+            />
           </div>
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link href="/forgot-password"
-                className="text-xs text-muted-foreground hover:underline">
+              <Link
+                href="/forgot-password"
+                className="text-xs text-muted-foreground hover:underline"
+              >
                 Forgot?
               </Link>
             </div>
-            <Input id="password" name="password"
-              type="password" required />
+            <Input id="password" name="password" type="password" required />
           </div>
         </CardContent>
 
         <CardFooter className="flex-col gap-3">
-          <Button type="submit" className="w-full"
-            disabled={isPending}>
-            {isPending ? 'Signing in...' : 'Sign in'}
+          <Button type="submit" className="w-full" disabled={isPending}>
+            {isPending ? "Signing in..." : "Sign in"}
           </Button>
           <p className="text-sm text-muted-foreground">
-            No account?{' '}
+            No account?{" "}
             <Link href="/register" className="underline">
               Register
             </Link>
@@ -102,5 +115,26 @@ export default function LoginPage() {
         </CardFooter>
       </form>
     </Card>
-  );
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <Card className="w-full max-w-sm animate-pulse">
+          <CardHeader>
+            <div className="h-6 w-32 rounded bg-muted" />
+            <div className="mt-2 h-4 w-48 rounded bg-muted" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="h-10 w-full rounded bg-muted" />
+            <div className="h-10 w-full rounded bg-muted" />
+          </CardContent>
+        </Card>
+      }
+    >
+      <LoginForm />
+    </Suspense>
+  )
 }
