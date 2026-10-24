@@ -127,34 +127,34 @@ export function InteractiveMcqDemo() {
   }
 
   return (
-    <Card className="w-full overflow-hidden border border-border/60 bg-card/60 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:shadow-primary/5">
+    <Card className="w-full overflow-hidden rounded-3xl border border-border/80 bg-card shadow-2xl backdrop-blur-xl transition-all duration-300">
       {/* Top Simulation Bar */}
-      <div className="flex flex-wrap items-center justify-between border-b border-border/40 bg-muted/40 px-6 py-3 text-xs font-medium">
+      <div className="flex flex-wrap items-center justify-between border-b border-border/60 bg-[#F4EDE4]/60 px-6 py-3.5 text-xs font-semibold dark:bg-[#182E22]/60">
         <div className="flex items-center gap-2">
-          <span className="flex h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500" />
-          <span className="font-semibold tracking-wider text-emerald-500 uppercase">
-            Live Simulation Mode
+          <span className="flex h-2.5 w-2.5 animate-pulse rounded-full bg-[#00A884]" />
+          <span className="font-extrabold tracking-wider text-[#00A884] uppercase">
+            Live Simulation Engine
           </span>
-          <span className="text-muted-foreground">
+          <span className="font-medium text-muted-foreground">
             • Question {currentIdx + 1} of {sampleQuestions.length}
           </span>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5 font-mono text-xs">
             <Timer
-              className={`h-4 w-4 ${secondsLeft < 10 ? "animate-bounce text-destructive" : "text-primary"}`}
+              className={`h-4 w-4 ${secondsLeft < 10 ? "animate-bounce text-[#C85B28]" : "text-[#17382B] dark:text-[#E8CCA4]"}`}
             />
             <span
               className={
                 secondsLeft < 10
-                  ? "font-bold text-destructive"
-                  : "text-foreground"
+                  ? "font-extrabold text-[#C85B28]"
+                  : "font-bold text-foreground"
               }
             >
               00:{secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft}
             </span>
           </div>
-          <div className="flex items-center gap-1 font-semibold text-amber-500">
+          <div className="flex items-center gap-1 font-bold text-[#C85B28]">
             <Award className="h-4 w-4" />
             <span>Score: {score.toFixed(2)}</span>
           </div>
@@ -162,11 +162,11 @@ export function InteractiveMcqDemo() {
       </div>
 
       <CardHeader className="pt-6 pb-3">
-        <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 text-xs font-semibold text-primary">
-          <Sparkles className="h-3 w-3" />
+        <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#84966F]/30 bg-[#84966F]/10 px-3 py-0.5 text-xs font-bold text-[#17382B] dark:text-[#E8CCA4]">
+          <Sparkles className="h-3 w-3 text-[#DE9E66]" />
           {q.category}
         </div>
-        <CardTitle className="pt-2 text-lg leading-snug font-bold md:text-xl">
+        <CardTitle className="pt-2.5 text-lg leading-snug font-extrabold text-foreground md:text-xl">
           {q.question}
         </CardTitle>
         <CardDescription className="text-xs text-muted-foreground">
@@ -177,32 +177,32 @@ export function InteractiveMcqDemo() {
 
       <CardContent className="space-y-4">
         {/* Options */}
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {q.options.map((option, idx) => {
             const letter = String.fromCharCode(65 + idx)
             const isChosen = selectedOption === idx
             const isCorrect = idx === q.correctAnswer
 
             let optionClasses =
-              "relative flex items-center gap-3 p-3.5 rounded-xl border text-sm font-medium transition-all text-left cursor-pointer select-none"
+              "relative flex items-center gap-3 p-4 rounded-2xl border text-sm font-semibold transition-all text-left cursor-pointer select-none"
 
             if (!isSubmitted) {
               if (isChosen) {
                 optionClasses +=
-                  " border-primary bg-primary/10 text-primary shadow-sm"
+                  " border-[#17382B] bg-[#F4EDE4] text-[#17382B] dark:border-[#DE9E66] dark:bg-[#1A3325] dark:text-[#E8CCA4] shadow-sm"
               } else {
                 optionClasses +=
-                  " border-border/60 bg-background/50 hover:border-primary/50 hover:bg-muted/40"
+                  " border-border/80 bg-card hover:border-[#17382B]/60 hover:bg-[#F4EDE4]/40"
               }
             } else {
               if (isCorrect) {
                 optionClasses +=
-                  " border-emerald-500/80 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold"
+                  " border-[#00A884] bg-[#00A884]/10 text-[#00A884] font-bold"
               } else if (isChosen && !isCorrect) {
                 optionClasses +=
-                  " border-destructive/80 bg-destructive/10 text-destructive line-through"
+                  " border-[#C85B28] bg-[#C85B28]/10 text-[#C85B28] line-through"
               } else {
-                optionClasses += " border-border/40 opacity-50"
+                optionClasses += " border-border/40 opacity-40"
               }
             }
 
@@ -215,24 +215,24 @@ export function InteractiveMcqDemo() {
                 className={optionClasses}
               >
                 <span
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-black transition-colors ${
                     isSubmitted && isCorrect
-                      ? "bg-emerald-500 text-white"
+                      ? "bg-[#00A884] text-white"
                       : isSubmitted && isChosen && !isCorrect
-                        ? "bg-destructive text-white"
+                        ? "bg-[#C85B28] text-white"
                         : isChosen
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground"
+                          ? "bg-[#17382B] text-white dark:bg-[#DE9E66] dark:text-[#17382B]"
+                          : "bg-[#F4EDE4] text-foreground dark:bg-[#182E22]"
                   }`}
                 >
                   {letter}
                 </span>
                 <span className="flex-1 text-sm">{option}</span>
                 {isSubmitted && isCorrect && (
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-[#00A884]" />
                 )}
                 {isSubmitted && isChosen && !isCorrect && (
-                  <XCircle className="h-4 w-4 shrink-0 text-destructive" />
+                  <XCircle className="h-4 w-4 shrink-0 text-[#C85B28]" />
                 )}
               </button>
             )
@@ -241,9 +241,9 @@ export function InteractiveMcqDemo() {
 
         {/* Explanation Card */}
         {isSubmitted && (
-          <div className="animate-in rounded-xl border border-border/60 bg-muted/40 p-4 text-xs leading-relaxed duration-300 fade-in slide-in-from-top-2">
+          <div className="animate-in rounded-2xl border border-[#DE9E66]/30 bg-[#F4EDE4]/60 p-4 text-xs leading-relaxed duration-300 fade-in slide-in-from-top-2 dark:bg-[#182E22]/60">
             <div className="mb-1 flex items-center gap-1.5 font-bold text-foreground">
-              <span className="font-mono text-primary">
+              <span className="font-mono text-[#17382B] dark:text-[#E8CCA4]">
                 💡 In-Depth Explanation:
               </span>
             </div>
@@ -252,7 +252,7 @@ export function InteractiveMcqDemo() {
         )}
 
         {/* Action Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
           <Button
             type="button"
             variant="ghost"
@@ -270,7 +270,7 @@ export function InteractiveMcqDemo() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={selectedOption === null}
-                className="gap-2 px-5 font-semibold shadow-md shadow-primary/20"
+                className="gap-2 rounded-xl bg-[#17382B] px-6 py-2.5 font-bold text-white shadow-md shadow-[#17382B]/20 hover:bg-[#11291F]"
               >
                 Submit Answer
               </Button>
@@ -278,7 +278,7 @@ export function InteractiveMcqDemo() {
               <Button
                 type="button"
                 onClick={handleNext}
-                className="gap-2 bg-emerald-600 px-5 font-semibold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700"
+                className="gap-2 rounded-xl bg-[#00A884] px-6 py-2.5 font-bold text-white shadow-md shadow-[#00A884]/20 hover:bg-[#008F7A]"
               >
                 Next Question &rarr;
               </Button>

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
@@ -10,6 +11,7 @@ import {
   Moon,
   Sparkles,
   LayoutDashboard,
+  Search,
 } from "lucide-react"
 import { useSyncExternalStore } from "react"
 import { SignOutButton } from "@/components/sign-out-button"
@@ -19,6 +21,7 @@ const emptySubscribe = () => () => {}
 export function Navbar() {
   const { resolvedTheme, setTheme } = useTheme()
   const { data: session, status } = useSession()
+  const pathname = usePathname()
 
   const mounted = useSyncExternalStore(
     emptySubscribe,
@@ -29,51 +32,68 @@ export function Navbar() {
   const isAuthenticated = status === "authenticated" && session?.user
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-md">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand */}
         <Link
           href="/"
           className="flex items-center gap-2.5 transition-transform hover:scale-[1.02]"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-primary/70 text-primary-foreground shadow-md shadow-primary/25">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/20">
             <GraduationCap className="h-5 w-5" />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg leading-none font-bold tracking-tight text-foreground">
-              Vittimul<span className="ml-1 font-black text-primary">MCQ</span>
+            <span className="text-lg leading-none font-extrabold tracking-tight text-foreground">
+              Vittimul<span className="ml-0.5 text-primary">MCQ</span>
             </span>
-            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="mt-0.5 text-[9px] font-bold tracking-widest text-muted-foreground uppercase">
               Live Examination System
             </span>
           </div>
         </Link>
 
-        {/* Desktop Nav Links */}
-        <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
+        {/* Center Nav Links with active green underline as in Image 1 */}
+        <nav className="hidden items-center gap-7 text-sm font-semibold text-muted-foreground md:flex">
           <Link
-            href="/#features"
-            className="transition-colors hover:text-foreground"
+            href="/"
+            className={`relative py-1 transition-colors hover:text-foreground ${
+              pathname === "/" ? "font-bold text-foreground" : ""
+            }`}
           >
-            Features
+            Home
+            {pathname === "/" && (
+              <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-[#00A884]" />
+            )}
           </Link>
           <Link
             href="/#live-demo"
             className="flex items-center gap-1.5 transition-colors hover:text-foreground"
           >
-            <span className="h-1.5 w-1.5 animate-ping rounded-full bg-emerald-500" />
-            Live Demo
+            <span className="h-2 w-2 animate-ping rounded-full bg-[#00A884]" />
+            Live Exams
+          </Link>
+          <Link
+            href="/#categories"
+            className="transition-colors hover:text-foreground"
+          >
+            Question Bank
           </Link>
           <Link
             href="/#upcoming-exams"
             className="transition-colors hover:text-foreground"
           >
-            Exams Routine
+            Syllabus & Routine
+          </Link>
+          <Link
+            href="/#features"
+            className="transition-colors hover:text-foreground"
+          >
+            Analytics
           </Link>
           {isAuthenticated && (
             <Link
               href="/dashboard"
-              className="flex items-center gap-1 font-semibold text-primary transition-colors hover:underline"
+              className="flex items-center gap-1 font-bold text-primary transition-colors hover:underline"
             >
               <LayoutDashboard className="h-3.5 w-3.5" />
               Dashboard
@@ -81,8 +101,19 @@ export function Navbar() {
           )}
         </nav>
 
-        {/* Right CTA & Theme Toggle */}
+        {/* Right CTA & Controls */}
         <div className="flex items-center gap-3">
+          {/* Quick Search Icon */}
+          <button
+            type="button"
+            className="hidden h-9 w-9 items-center justify-center rounded-xl border border-border/80 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground sm:flex"
+            title="Search exams"
+            aria-label="Search"
+          >
+            <Search className="h-4 w-4" />
+          </button>
+
+          {/* Theme Toggle */}
           {mounted && (
             <Button
               type="button"
@@ -91,7 +122,7 @@ export function Navbar() {
               onClick={() =>
                 setTheme(resolvedTheme === "dark" ? "light" : "dark")
               }
-              className="h-9 w-9 rounded-xl border border-border/40 text-muted-foreground hover:text-foreground"
+              className="h-9 w-9 rounded-xl border border-border/80 text-muted-foreground hover:text-foreground"
               title="Toggle theme (or press 'D')"
             >
               {resolvedTheme === "dark" ? (
@@ -107,7 +138,7 @@ export function Navbar() {
               <Link href="/dashboard">
                 <Button
                   size="sm"
-                  className="gap-1.5 rounded-xl text-xs font-semibold shadow-md shadow-primary/20"
+                  className="gap-1.5 rounded-xl bg-primary text-xs font-bold text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90"
                 >
                   <LayoutDashboard className="h-3.5 w-3.5" />
                   Dashboard
@@ -121,7 +152,7 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="hidden text-xs font-semibold sm:inline-flex"
+                  className="hidden text-xs font-bold sm:inline-flex"
                 >
                   Sign In
                 </Button>
@@ -129,10 +160,10 @@ export function Navbar() {
               <Link href="/register">
                 <Button
                   size="sm"
-                  className="gap-1.5 rounded-xl text-xs font-semibold shadow-md shadow-primary/20"
+                  className="gap-1.5 rounded-xl bg-primary text-xs font-bold text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90"
                 >
                   <Sparkles className="h-3.5 w-3.5" />
-                  Get Started
+                  Join Live Exams
                 </Button>
               </Link>
             </div>
