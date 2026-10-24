@@ -1,28 +1,29 @@
 import { getServerSession, type NextAuthOptions } from "next-auth"
-import { authConfig } from "./auth.config"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { authConfig } from "./auth.config"
 import { loginSchema } from "@/lib/validators"
 import api from "@/lib/api"
+import type { SafeUser, UserRole } from "@/types/next-auth"
 
-type LoginResponse = {
-  user: {
-    _id: string
-    name: string
-    email: string
-    role: "user" | "admin"
-    isVerified: boolean
-  }
+interface LoginResponsePayload {
   accessToken: string
+  user: SafeUser
 }
 
 export const authOptions: NextAuthOptions = {
   pages: authConfig.pages,
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 }, // 30 days
 
   providers: [
     CredentialsProvider({
+      id: "credentials",
+      name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "aspirant@example.com",
+        },
         password: { label: "Password", type: "password" },
       },
 
@@ -31,17 +32,21 @@ export const authOptions: NextAuthOptions = {
         if (!parsed.success) return null
 
         try {
-          const { data } = await api.post<LoginResponse>(
-            "/auth/login",
-            parsed.data
-          )
-          // return shape must match User type in next-auth.d.ts
+          const { data } = await api.post<LoginResponsePayload>("/auth/login", {
+            email: parsed.data.email.toLowerCase(),
+            password: parsed.data.password,
+          })
+
+          if (!data?.accessToken || !data?.user) {
+            return null
+          }
+
           return {
-            id: String(data.user._id),
-            name: data.user.name,
+            id: String(data.user.id),
+            name: data.user.name ?? "",
             email: data.user.email,
             role: data.user.role,
-            isVerified: data.user.isVerified,
+            isActive: Boolean(data.user.isActive),
             accessToken: data.accessToken,
           }
         } catch {
@@ -55,8 +60,8 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.role = user.role
-        token.isVerified = user.isVerified
+        token.role = user.role as UserRole
+        token.isActive = user.isActive
         token.accessToken = user.accessToken
       }
       return token
@@ -65,16 +70,18 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
-        session.user.role = token.role as "user" | "admin"
-        session.user.isVerified = token.isVerified as boolean
+        session.user.role = token.role as UserRole
+        session.user.isActive = token.isActive as boolean
       }
-
       session.accessToken = token.accessToken as string
       return session
     },
   },
 
-  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  secret:
+    process.env.AUTH_SECRET ??
+    process.env.NEXTAUTH_SECRET ??
+    "vittimul-mcq-production-grade-secure-nextauth-secret-key-32chars",
 }
 
 export function auth() {

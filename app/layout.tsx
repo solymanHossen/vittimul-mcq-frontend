@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import { Providers } from "@/components/providers"
 import { cn } from "@/lib/utils"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
@@ -65,7 +65,7 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
-        <ThemeProvider>{children}</ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

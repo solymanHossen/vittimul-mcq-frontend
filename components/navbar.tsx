@@ -2,19 +2,31 @@
 
 import Link from "next/link"
 import { useTheme } from "next-themes"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
-import { GraduationCap, Sun, Moon, Sparkles } from "lucide-react"
+import {
+  GraduationCap,
+  Sun,
+  Moon,
+  Sparkles,
+  LayoutDashboard,
+} from "lucide-react"
 import { useSyncExternalStore } from "react"
+import { SignOutButton } from "@/components/sign-out-button"
 
 const emptySubscribe = () => () => {}
 
 export function Navbar() {
   const { resolvedTheme, setTheme } = useTheme()
+  const { data: session, status } = useSession()
+
   const mounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
     () => false
   )
+
+  const isAuthenticated = status === "authenticated" && session?.user
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
@@ -40,30 +52,33 @@ export function Navbar() {
         {/* Desktop Nav Links */}
         <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
           <Link
-            href="#features"
+            href="/#features"
             className="transition-colors hover:text-foreground"
           >
             Features
           </Link>
           <Link
-            href="#live-demo"
+            href="/#live-demo"
             className="flex items-center gap-1.5 transition-colors hover:text-foreground"
           >
             <span className="h-1.5 w-1.5 animate-ping rounded-full bg-emerald-500" />
             Live Demo
           </Link>
           <Link
-            href="#upcoming-exams"
+            href="/#upcoming-exams"
             className="transition-colors hover:text-foreground"
           >
-            Exams Schedule
+            Exams Routine
           </Link>
-          <Link
-            href="#leaderboard"
-            className="transition-colors hover:text-foreground"
-          >
-            Leaderboard
-          </Link>
+          {isAuthenticated && (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-1 font-semibold text-primary transition-colors hover:underline"
+            >
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              Dashboard
+            </Link>
+          )}
         </nav>
 
         {/* Right CTA & Theme Toggle */}
@@ -87,25 +102,41 @@ export function Navbar() {
             </Button>
           )}
 
-          <Link href="/login">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden text-xs font-semibold sm:inline-flex"
-            >
-              Sign In
-            </Button>
-          </Link>
-
-          <Link href="/register">
-            <Button
-              size="sm"
-              className="gap-1.5 rounded-xl text-xs font-semibold shadow-md shadow-primary/20"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              Get Started
-            </Button>
-          </Link>
+          {mounted && isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <Link href="/dashboard">
+                <Button
+                  size="sm"
+                  className="gap-1.5 rounded-xl text-xs font-semibold shadow-md shadow-primary/20"
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  Dashboard
+                </Button>
+              </Link>
+              <SignOutButton />
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden text-xs font-semibold sm:inline-flex"
+                >
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button
+                  size="sm"
+                  className="gap-1.5 rounded-xl text-xs font-semibold shadow-md shadow-primary/20"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Get Started
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>
